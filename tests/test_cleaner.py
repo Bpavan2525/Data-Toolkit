@@ -74,3 +74,5 @@ def test_web_sample_and_upload():
     r = client.post("/", data={"file": (io.BytesIO(b"x"), "bad.pdf")}, content_type="multipart/form-data")
     assert r.status_code == 400
     assert client.post("/", data={}).status_code == 400
+    r = client.get("/?sample=1")
+    assert r.status_code == 200 and b"What changed" in r.data

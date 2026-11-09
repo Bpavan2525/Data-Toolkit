@@ -1,4 +1,5 @@
 import base64
+import os
 
 from flask import Flask, render_template, request
 
@@ -17,15 +18,17 @@ def create_app():
 
     @app.get("/")
     def home():
+        if request.args.get("sample"):
+            return upload()
         return render_template("index.html")
 
     @app.post("/")
     def upload():
         f = request.files.get("file")
-        sample = request.form.get("sample")
+        sample = request.values.get("sample")
         try:
             if sample:
-                with open(app.root_path + "/../samples/customers_messy.csv", "rb") as fh:
+                with open(os.path.join(app.root_path, "..", "samples", "customers_messy.csv"), "rb") as fh:
                     name, data = "customers_messy.csv", fh.read()
             elif f and f.filename:
                 name, data = f.filename, f.read()
@@ -35,7 +38,7 @@ def create_app():
             out, report = clean(df)
         except Exception as e:  # show the reason instead of a 500 page
             return render_template("index.html", error=f"Couldn't read that file: {e}"), 400
-        fmt = request.form.get("format", "csv")
+        fmt = request.values.get("format", "csv")
         fmt = "xlsx" if fmt == "xlsx" else "csv"
         payload = base64.b64encode(to_bytes(out, fmt)).decode()
         mime = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" if fmt == "xlsx" else "text/csv"
