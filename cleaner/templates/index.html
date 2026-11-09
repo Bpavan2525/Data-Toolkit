@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spreadsheet Cleaner</title>
+<style>
+:root{--bg:#f7f7f5;--card:#fff;--ink:#16181d;--muted:#5d6470;--line:#e3e5e8;--brand:#1d4ed8;--ok:#15803d}
+@media (prefers-color-scheme:dark){:root{--bg:#121417;--card:#1b1e23;--ink:#eceef1;--muted:#a3a9b3;--line:#2c3038;--brand:#60a5fa;--ok:#4ade80}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:40px 16px 64px}
+h1{font-size:clamp(28px,5vw,40px);margin:0 0 8px}h2{margin:32px 0 10px;font-size:21px}
+p.lead{color:var(--muted);margin:0 0 20px;max-width:660px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}
+button,.btn{background:var(--brand);color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;font-size:15px}
+.ghost{background:transparent;color:var(--brand);border:1px solid var(--brand)}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.err{color:#dc2626;font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat b{display:block;font-size:26px;color:var(--ok)}.stat span{color:var(--muted);font-size:14px}
+.scroll{overflow-x:auto}table.t{border-collapse:collapse;font-size:13px;min-width:100%}
+table.t td,table.t th{border:1px solid var(--line);padding:5px 8px;white-space:nowrap;text-align:left}
+ul{color:var(--muted)}a{color:var(--brand)}
+</style>
+</head>
+<body><div class="wrap">
+<h1>Spreadsheet Cleaner</h1>
+<p class="lead">Upload a messy CSV or Excel file of customers, orders or leads. Python (pandas) tidies the headers, trims spaces, removes blank and duplicate rows, formats phone numbers, lowercases emails, and turns text dates and amounts into real dates and numbers.</p>
+
+<div class="card">
+<form method="post" enctype="multipart/form-data" class="row">
+  <input type="file" name="file" accept=".csv,.xlsx,.xls">
+  <select name="format"><option value="csv">Get CSV</option><option value="xlsx">Get Excel</option></select>
+  <button type="submit">Clean my file</button>
+  <button type="submit" name="sample" value="1" class="ghost">Try the sample file</button>
+</form>
+<p style="color:var(--muted);font-size:14px;margin:10px 0 0">Files are processed in memory and not stored. Max 4 MB.</p>
+{% if error %}<p class="err">{{ error }}</p>{% endif %}
+</div>
+
+{% if report %}
+<h2>What changed</h2>
+<div class="stats">
+  <div class="card stat"><b>{{ report.rows_in }} → {{ report.rows_out }}</b><span>rows</span></div>
+  <div class="card stat"><b>{{ report.duplicates_removed }}</b><span>duplicates removed</span></div>
+  <div class="card stat"><b>{{ report.blank_rows_removed }}</b><span>blank rows removed</span></div>
+  <div class="card stat"><b>{{ report.phones_fixed }}</b><span>phone numbers formatted</span></div>
+  <div class="card stat"><b>{{ report.cells_trimmed }}</b><span>cells trimmed</span></div>
+  <div class="card stat"><b>{{ report.invalid_emails }}</b><span>emails to check by hand</span></div>
+</div>
+<ul>
+  {% if report.date_columns %}<li>Read as dates: {{ report.date_columns|join(", ") }}</li>{% endif %}
+  {% if report.number_columns %}<li>Read as numbers: {{ report.number_columns|join(", ") }}</li>{% endif %}
+  {% if report.empty_columns_removed %}<li>Empty columns dropped: {{ report.empty_columns_removed|join(", ") }}</li>{% endif %}
+</ul>
+<p><a class="btn" href="{{ download }}" download="{{ download_name }}">Download {{ download_name }}</a></p>
+<h2>Before</h2><div class="card scroll">{{ before|safe }}</div>
+<h2>After</h2><div class="card scroll">{{ after|safe }}</div>
+{% endif %}
+
+<p style="color:var(--muted);margin-top:32px">Source, tests and a command-line version: <a href="https://github.com/Bpavan2525/Data-Toolkit">github.com/Bpavan2525/Data-Toolkit</a></p>
+</div></body></html>
