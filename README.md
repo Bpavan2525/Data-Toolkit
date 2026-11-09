@@ -2,7 +2,7 @@
 
 Clean messy CSV and Excel files with **Python and pandas**, from a web page or the command line. Built for the files small businesses actually have: customer lists, orders and leads typed by hand, exported from different tools, and full of stray spaces, duplicates and mixed formats.
 
-**Live demo:** LIVE_URL (press "Try the sample file" to see a before and after)
+**Live demo:** https://pavan-sheet-cleaner.vercel.app ([see a before and after](https://pavan-sheet-cleaner.vercel.app/?sample=1))
 
 ## What it fixes
 
